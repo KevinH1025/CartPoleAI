@@ -11,6 +11,6 @@ class DDQN_MemoryBuffer:
 
     def get_batch(self):
         if len(self.buffer) < self.batch_size:
-            return self.buffer
+            return None
         else:
             return random.sample(self.buffer, self.batch_size)

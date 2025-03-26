@@ -1,11 +1,11 @@
 from train import train_ddqn
-from DDQN import DDQN_Agent
-from cartPole import CartPole
+from models.DDQN import DDQN_Agent
+from logic.cartPole import CartPole
 
 def main():
 
-    agent = DDQN_Agent(input=4)
-    cartpole = CartPole()
+    agent = DDQN_Agent(input=4, plot=True)
+    cartpole = CartPole(plot = True)
 
     train_ddqn(agent, cartpole)
 

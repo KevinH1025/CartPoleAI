@@ -7,7 +7,7 @@ CART_W = 50
 CART_H = 20
 
 # frame rate
-FPS = 30
+FPS = 60
 
 # colors
 BLACK = (0, 0, 0)

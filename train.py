@@ -1,6 +1,6 @@
 import pygame
-import settings
-import UI
+import logic.settings as settings
+import utils.UI as UI
 
 def train_ddqn(agent, cartpole, render=True):
     done = False

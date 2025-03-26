@@ -1,5 +1,5 @@
 import pygame
-import settings
+import logic.settings as settings
 
 pygame.init()
 font = pygame.font.Font("Arial.ttf", 20)
