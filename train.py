@@ -10,36 +10,48 @@ def train_ddqn(agent, cartpole, render=True):
         screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
         iteration = 0
 
+    # not done with training
     while not done:
-        if render:
-            clock.tick(settings.FPS)
-            current_time = pygame.time.get_ticks()
-            elapsed_time = (current_time - clock.get_time()) / 1000 # convert ms into s
-            for event in pygame.event.get(): # event handling
-                if event.type == pygame.QUIT:
-                    done = True
-                    break
-        
-        # get current state and current actions
-        current_state = cartpole.get_state()
-        current_action = agent.get_action(current_state)
-        
-        # reward from the action
-        reward, game_over = cartpole.move(action=current_action)
+        end_episode = False
+        # the current episode did not end
+        while not end_episode:
+            if render:
+                clock.tick(settings.FPS)
+                current_time = pygame.time.get_ticks()
+                elapsed_time = (current_time - clock.get_time()) / 1000 # convert ms into s
+                for event in pygame.event.get(): # event handling
+                    if event.type == pygame.QUIT:
+                        done = True
+                        end_episode = True
+                        break
+            
+            # get current state and current actions
+            current_state = cartpole.get_state()
+            current_action = agent.get_action(current_state)
+            
+            # reward from the action
+            reward, game_over = cartpole.move(action=current_action)
 
-        # get next state
-        next_state = cartpole.get_state()
+            # episode ended?
+            end_episode = game_over
 
-        # save it to the buffer
-        agent.store_experience(current_state, current_action, reward, next_state, game_over)
-        
-        # train the agent
-        if agent.train_process() != False and render == True:
-            iteration += 1
+            # get next state
+            next_state = cartpole.get_state()
 
-        if render:
-            UI.render(screen, cartpole, elapsed_time, iteration)
-            pygame.display.flip()
-    
+            # save it to the buffer
+            agent.store_experience(current_state, current_action, reward, next_state, game_over)
+            
+            # train the agent
+            if agent.train_process() != False and render == True:
+                iteration += 1 # one train iteration
+
+            # render the cartpole
+            if render:
+                UI.render(screen, cartpole, elapsed_time, iteration)
+                pygame.display.flip()
+
+        # plot the graphs after episode ends
+        cartpole.plot_score()
+
     if render:
         pygame.quit()

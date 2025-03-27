@@ -8,10 +8,10 @@ from utils.plot import plot_score
 # range for inital pole's angle
 init_angle = math.radians(10)
 
-# scaling factor
+# scaling factor -> converting pixel to meters
 scaling = 100
 
-# limits before restart
+# limits before episode end
 pos_lim = (settings.WIDTH-settings.CART_W)/scaling  # max position
 angle_lim = math.radians(24)                        # max angle difference
 
@@ -66,8 +66,8 @@ class CartPole:
 
         # agent did not die
         self.died = False
-        
-        # check if exceeded the limit
+
+        # check for reset
         self.reset()
 
         return self.reward, self.died
@@ -81,14 +81,15 @@ class CartPole:
             self.angular_velocity = 0 
 
             self.num_episodes += 1
+
+            # best score
             if self.current_score > self.best_score:
                 self.best_score = self.current_score
 
-            # calculate mean score and plot
+            # add plotting values
             if self.plot:
                 self.score.append(self.current_score)
                 self.mean_score.append(sum(self.score)/len(self.score))
-                plot_score(self.score, self.mean_score)
 
             self.current_score = 0
 
@@ -121,3 +122,8 @@ class CartPole:
         y = middle_y - pole_length * math.cos(self.angle)
 
         pygame.draw.line(screen, settings.GREEN, (middle_x, middle_y), (x, y), 3)
+
+    # plot the current and mean score
+    def plot_score(self):
+        if self.plot:
+            plot_score(self.score, self.mean_score)
