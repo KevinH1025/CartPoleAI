@@ -1,22 +1,21 @@
 import pygame
-import logic.settings as settings
+import config.display as display
 import utils.UI as UI
 
 def train_ddqn(agent, cartpole, render=True):
-    done = False
-
     if render:
         clock = pygame.time.Clock()
-        screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
+        screen = pygame.display.set_mode((display.WIDTH, display.HEIGHT))
         iteration = 0
-
+    
+    done = False
     # not done with training
     while not done:
         end_episode = False
         # the current episode did not end
         while not end_episode:
             if render:
-                clock.tick(settings.FPS)
+                clock.tick(display.FPS)
                 current_time = pygame.time.get_ticks()
                 elapsed_time = (current_time - clock.get_time()) / 1000 # convert ms into s
                 for event in pygame.event.get(): # event handling
@@ -50,8 +49,9 @@ def train_ddqn(agent, cartpole, render=True):
                 UI.render(screen, cartpole, elapsed_time, iteration)
                 pygame.display.flip()
 
-        # plot the graphs after episode ends
+        # plot graphs after episode ends
         cartpole.plot_score()
+        agent.plot_model()
 
     if render:
         pygame.quit()

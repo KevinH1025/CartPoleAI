@@ -2,6 +2,9 @@
 WIDTH = 800
 HEIGHT = 600
 
+# scaling factor -> converting pixel to meters
+scaling = 100
+
 # cart's widht and height
 CART_W = 50
 CART_H = 20

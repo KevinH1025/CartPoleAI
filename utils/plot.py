@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+# plot score
 def plot_score(score, mean_score):
     plt.figure("Score plot")  
     plt.clf()
@@ -29,6 +30,7 @@ def plot_loss(loss, average_loss):
     plt.text(len(average_loss)-1, average_loss[-1], str(average_loss[-1])) # write the value of the last element
     plt.pause(0.001)
 
+# plot q values -> Q-network
 def plot_qvalue(avg_qvalues):
     plt.figure("Q-values plot")  
     plt.clf()
@@ -41,6 +43,7 @@ def plot_qvalue(avg_qvalues):
     plt.text(len(avg_qvalues)-1, avg_qvalues[-1], str(avg_qvalues[-1])) # write the value of the last element
     plt.pause(0.001)
 
+# plot epsilon -> Q-network
 def plot_epsilon(epsilon):
     plt.figure("Epsilon plot")  
     plt.clf()

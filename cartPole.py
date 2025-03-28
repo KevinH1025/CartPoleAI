@@ -1,25 +1,15 @@
 import random
 import math
-import logic.settings as settings
-import utils.constants as constants
+import config.display as display
+import config.constants as constants
 import pygame
 from utils.plot import plot_score
 
-# range for inital pole's angle
-init_angle = math.radians(10)
-
-# scaling factor -> converting pixel to meters
-scaling = 100
-
-# limits before episode end
-pos_lim = (settings.WIDTH-settings.CART_W)/scaling  # max position
-angle_lim = math.radians(24)                        # max angle difference
-
 class CartPole:
     def __init__(self, plot):
-        self.pos = [settings.WIDTH/(2 * scaling), 2/3 * settings.HEIGHT] # cart's initial postion, in the middle of line (x-axis scaled into meters)
+        self.pos = [display.WIDTH/(2 * display.scaling), 2/3 * display.HEIGHT] # cart's initial postion, in the middle of line (x-axis scaled into meters)
         self.velocity = 0 # cart's initial velocity
-        self.angle = random.uniform(-init_angle, init_angle) # pole's initial angle
+        self.angle = random.uniform(-constants.init_angle, constants.init_angle) # pole's initial angle
 
         self.angular_velocity = 0 # pole's initial angular velocity
         self.force = 0 # initial force applied to the cart
@@ -41,9 +31,9 @@ class CartPole:
         
         # decoding the action
         if action == 0:
-            self.force = constants.F
+            self.force = constants.F # appy force from right
         else: 
-            self.force = -constants.F
+            self.force = -constants.F # apply force from left
 
         temp = (self.force + constants.m * constants.l * self.angle**2 * math.sin(self.angle)) / (constants.M + constants.m)
         # pole angular acceleration
@@ -54,6 +44,10 @@ class CartPole:
         # update the values
         self.velocity += cart_acc * constants.dt
         self.angular_velocity += angular_acc * constants.dt
+
+        # apply friction
+        self.velocity *= (1 - constants.c)
+        self.angular_velocity *= (1 - constants.p)
 
         self.pos[0] += self.velocity * constants.dt
         self.angle += self.angular_velocity * constants.dt
@@ -74,10 +68,10 @@ class CartPole:
 
     # end the episode if exceed the limit
     def reset(self):
-        if self.pos[0] < 0 or self.pos[0] > pos_lim or abs(self.angle) > angle_lim:
-            self.pos[0] = settings.WIDTH/(2 * scaling)
+        if self.pos[0] < 0 or self.pos[0] > constants.pos_lim or abs(self.angle) > constants.angle_lim:
+            self.pos[0] = display.WIDTH/(2 * display.scaling)
             self.velocity = 0 
-            self.angle = random.uniform(-init_angle, init_angle) 
+            self.angle = random.uniform(-constants.init_angle, constants.init_angle) 
             self.angular_velocity = 0 
 
             self.num_episodes += 1
@@ -104,24 +98,24 @@ class CartPole:
     # render the cartpole and score
     def draw(self, screen):
         # road
-        pygame.draw.line(screen, settings.WHITE, (0, self.pos[1] + settings.CART_H/2), (settings.WIDTH, self.pos[1] + settings.CART_H/2), 2)
+        pygame.draw.line(screen, display.WHITE, (0, self.pos[1] + display.CART_H/2), (display.WIDTH, self.pos[1] + display.CART_H/2), 2)
 
         # scaling back into pixels for rendering
-        scaled_pos = self.pos[0] * scaling
+        scaled_pos = self.pos[0] * display.scaling
 
         # cart
-        pygame.draw.rect(screen, settings.RED, (scaled_pos, self.pos[1], settings.CART_W, settings.CART_H))
+        pygame.draw.rect(screen, display.RED, (scaled_pos, self.pos[1], display.CART_W, display.CART_H))
 
         # pole
-        middle_x = scaled_pos + settings.CART_W / 2
-        middle_y = self.pos[1] + settings.CART_H / 2
+        middle_x = scaled_pos + display.CART_W / 2
+        middle_y = self.pos[1] + display.CART_H / 2
 
-        pole_length = constants.l * scaling
+        pole_length = constants.l * display.scaling
 
         x = middle_x + pole_length * math.sin(self.angle)
         y = middle_y - pole_length * math.cos(self.angle)
 
-        pygame.draw.line(screen, settings.GREEN, (middle_x, middle_y), (x, y), 3)
+        pygame.draw.line(screen, display.GREEN, (middle_x, middle_y), (x, y), 3)
 
     # plot the current and mean score
     def plot_score(self):

@@ -3,7 +3,7 @@ import torch
 import copy
 import torch.nn as nn
 import torch.optim as optim
-from hyperpara import DDQN_param
+from config.hyperpara import DDQN_param
 from utils.memory import DDQN_MemoryBuffer
 from utils.plot import plot_loss, plot_qvalue, plot_epsilon
 
@@ -99,7 +99,7 @@ class DDQN_Agent(nn.Module):
         if batch == None:
             return False
         curr_states, curr_actions, rewards, next_states, dones = zip(*batch)
-
+        # convert it into tensors
         curr_states = torch.tensor(curr_states, dtype=torch.float) # (batch_size, state_size)
         curr_actions = torch.tensor(curr_actions, dtype=torch.int64) # (batch_size, ) ; int, because of gather()
         rewards = torch.tensor(rewards, dtype=torch.float) # (batch_size, )
@@ -115,8 +115,10 @@ class DDQN_Agent(nn.Module):
 
         # compute target Q value (target neural network). It does not need gradients, since this network is only for reference
         with torch.no_grad():
-             # Use main model to select best actions
-            best_actions = self.model(next_states).argmax(dim=1, keepdim=True)
+            # Use main model to select best actions
+            output_next = self.model(next_states) # (batch_size, 2)
+            best_actions = torch.argmax(output_next, dim=1) # find arg across each sample -> (batch, )
+            best_actions = best_actions.unsqueeze(1) # (batch, 1)
 
             # Use target model to evaluate those actions
             target_output = self.model_target(next_states) # (batch_size, 2)
@@ -135,7 +137,7 @@ class DDQN_Agent(nn.Module):
         loss.backward()
 
         # clipping the gradient
-        #torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=5.0)
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
 
         # perform a gradient step
         self.optim.step()
@@ -146,26 +148,34 @@ class DDQN_Agent(nn.Module):
             self.model_target.load_state_dict(self.model.state_dict())
             self.target_counter = 0
 
-        # plot the loss
-        if self.plot:
+        # save plotting data 
+        if self.plot:   
             self.plot_counter += 1
             if self.plot_counter == self.plot_frequancy:
-                # average Q value for the batch
+                # average Q value of a batch
                 Q_values = output.gather(1, curr_actions).squeeze(1)
                 self.q_values.append(Q_values.mean().item())
-                plot_qvalue(self.q_values)
 
                 # loss and average loss
                 self.loss_his.append(loss.item())
                 self.loss_mean.append(sum(self.loss_his)/len(self.loss_his))
-                plot_loss(self.loss_his, self.loss_mean)
 
                 # epsilon
-                #self.epsilon.append(self.param.epsilon)
-                #plot_epsilon(self.epsilon)
+                self.epsilon.append(self.param.epsilon)
 
                 self.plot_counter = 0
 
+    # plot model's values
+    def plot_model(self):
+        if self.plot and all(len(x)!=0 for x in [self.q_values, self.loss_his, self.loss_mean, self.epsilon]):
+                # plot average Q value for a batch
+                plot_qvalue(self.q_values)
+
+                # loss and average loss
+                plot_loss(self.loss_his, self.loss_mean)
+
+                # epsilon
+                plot_epsilon(self.epsilon)
 
 
 

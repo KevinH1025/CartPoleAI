@@ -1,6 +1,6 @@
-
 class DDQN_param:
     def __init__(self):
+        # model's para
         self.lr = 0.001
         self.gamma = 0.99
         self.epsilon = 1
@@ -8,10 +8,12 @@ class DDQN_param:
         self.epsilon_decay_rate = 0.95
         self.epislon_decay_frequancy = 50
 
-        self.main_update_frequancy = 0
+        self.main_update_frequancy = 1
         self.target_update_frequancy = 500
 
+        # buffer's para
         self.buffer_size = 100_000
-        self.batch_size = 1024
+        self.batch_size = 128
 
-        self.plot_frequancy = 10
+        # plotting's para
+        self.plot_frequancy = 10 # every x step model's values are plotted. after episode ends 

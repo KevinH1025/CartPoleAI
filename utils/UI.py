@@ -1,11 +1,11 @@
 import pygame
-import logic.settings as settings
+import config.display as display
 
 pygame.init()
 font = pygame.font.Font("Arial.ttf", 20)
 
 def render(screen, cartpole, elapsed_time, iteration=None):
-    screen.fill(settings.BLACK)
+    screen.fill(display.BLACK)
     cartpole.draw(screen)
 
     # Render texts
@@ -17,6 +17,6 @@ def render(screen, cartpole, elapsed_time, iteration=None):
     if iteration != None:
         draw_text(screen, f"Iterations: {iteration}", (0, 100))
 
-def draw_text(screen, text, position, antialias=True, color = settings.WHITE):
+def draw_text(screen, text, position, antialias=True, color = display.WHITE):
     text_surface = font.render(text, antialias, color)
     screen.blit(text_surface, position)
