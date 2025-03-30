@@ -11,18 +11,22 @@ def train_ddqn(agent, cartpole, render=True):
     done = False
     # not done with training
     while not done:
+        start_time = pygame.time.get_ticks()
         end_episode = False
+        
         # the current episode did not end
         while not end_episode:
             if render:
                 clock.tick(display.FPS)
                 current_time = pygame.time.get_ticks()
-                elapsed_time = (current_time - clock.get_time()) / 1000 # convert ms into s
+                elapsed_time = (current_time - start_time) / 1000 # convert ms into s
                 for event in pygame.event.get(): # event handling
                     if event.type == pygame.QUIT:
                         done = True
-                        end_episode = True
-                        break
+
+            # close the program if the user clicks on the close
+            if done:
+                break
             
             # get current state and current actions
             current_state = cartpole.get_state()

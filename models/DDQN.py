@@ -10,7 +10,7 @@ from utils.memory import DDQN_MemoryBuffer
 from utils.plot import plot_loss, plot_qvalue, plot_epsilon
 
 class DDQN_Agent(nn.Module):
-    def __init__(self, input, plot, output=2):
+    def __init__(self, input:int, plot:bool, output=2):
         super().__init__()
 
         self.model = nn.Sequential(
@@ -79,9 +79,9 @@ class DDQN_Agent(nn.Module):
     def store_experience(self, curr_state, curr_action, reward, next_state, done):
         self.memory.save(curr_state, curr_action, reward, next_state, done)
     
-    def get_action(self, state):
+    def get_action(self, state, test=False):
         # exploration
-        if random.random() < self.param.epsilon:
+        if random.random() < self.param.epsilon and not test:
             self.epsilon_counter += 1 # increse the decay counter
             force_dir = random.choice([0, 1]) # 0 apply force on the left
         # exploitation
@@ -91,7 +91,7 @@ class DDQN_Agent(nn.Module):
             force_dir = torch.argmax(output) # chose the largest value
         
         # update epsilon
-        if self.epsilon_counter == self.param.epislon_decay_frequancy:
+        if self.epsilon_counter == self.param.epislon_decay_frequancy and not test:
             self.param.epsilon = max(self.param.epsilon_min, self.param.epsilon * self.param.epsilon_decay_rate)
             self.epsilon_counter = 0
 
@@ -220,3 +220,41 @@ class DDQN_Agent(nn.Module):
         self.last_path_main = path_main
         self.last_path_target = path_target
         self.last_path_buffer = path_buffer
+
+    # load main, target and buffer
+    def load_model(self, path_folder, continue_training=False):
+        # check if folder exists
+        if not os.path.exists(path_folder):
+            raise FileNotFoundError(f"Folder {path_folder} does not exist")
+        
+        model_path = None
+
+        # check if file exists
+        for file in os.listdir(path_folder):
+            if "main" in file:
+                model_path = os.path.join(path_folder, file)
+        
+        if model_path is None: 
+            raise FileNotFoundError(f"No file named 'main'")
+        
+        # load the main network
+        self.model.load_state_dict(torch.load(model_path, weights_only=True))
+        print("Main network loaded")
+
+        if continue_training:
+            target_path, buffer_path = None
+            # load the target network
+            if "target" in file:
+                target_path = os.path.join(path_folder, file)
+                self.model_target.load_state_dict(torch.load(target_path, weights_only=True))
+                print("target network loaded")
+            else: 
+                raise FileNotFoundError(f"No file named 'target'")
+            
+            # load the memory buffer
+            if "buffer" in file:
+                buffer_path = os.path.join(path_folder, file)
+                self.model_target.load_state_dict(torch.load(buffer_path))
+                print("Memory buffer loaded")
+            else: 
+                raise FileNotFoundError(f"No file named 'buffer'")

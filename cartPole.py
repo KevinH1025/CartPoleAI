@@ -7,7 +7,7 @@ from utils.plot import plot_score
 from collections import deque
 
 class CartPole:
-    def __init__(self, plot):
+    def __init__(self, plot:bool):
         self.pos = [display.WIDTH/(2 * display.scaling), 2/3 * display.HEIGHT] # cart's initial postion, in the middle of line (x-axis scaled into meters)
         self.velocity = 0 # cart's initial velocity
         self.angle = random.uniform(-constants.init_angle, constants.init_angle) # pole's initial angle
@@ -131,5 +131,5 @@ class CartPole:
 
     # plot the current and mean score
     def plot_score(self):
-        if self.plot:
+        if self.plot and len(self.score) >= 1:
             plot_score(self.score, self.mean_score)
