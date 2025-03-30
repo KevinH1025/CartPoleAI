@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import matplotlib
+
+# matplotlib.use('Agg') # prevents crushing -> saves to the image file
 
 # plot score
 def plot_score(score, mean_score):

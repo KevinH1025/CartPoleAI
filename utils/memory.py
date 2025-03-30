@@ -1,4 +1,6 @@
 import random
+import os
+import pickle
 from collections import deque
 
 class DDQN_MemoryBuffer:
@@ -14,3 +16,7 @@ class DDQN_MemoryBuffer:
             return None
         else:
             return random.sample(self.buffer, self.batch_size)
+        
+    def save_buffer(self, path):
+        with open(path, "wb") as f:
+            pickle.dump(self.buffer, f)

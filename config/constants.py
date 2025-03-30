@@ -1,5 +1,5 @@
 import math
-import display
+from config import display
 
 # constants
 g = 9.81    # gravity 

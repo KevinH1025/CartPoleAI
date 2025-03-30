@@ -1,6 +1,8 @@
 import random
 import torch
 import copy
+import os
+import datetime
 import torch.nn as nn
 import torch.optim as optim
 from config.hyperpara import DDQN_param
@@ -56,6 +58,12 @@ class DDQN_Agent(nn.Module):
             self.epsilon = []
             self.plot_frequancy = self.param.plot_frequancy
             self.plot_counter = 0
+
+        # for saving model
+        self.run_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.last_path_main = None
+        self.last_path_target = None
+        self.last_path_buffer = None
 
     def forward(self, x):   
         x = self.to_tensor(x)
@@ -177,6 +185,38 @@ class DDQN_Agent(nn.Module):
                 # epsilon
                 plot_epsilon(self.epsilon)
 
+    # save model and memory buffer
+    def save_model(self, num_iter, avg_score):
+        path = f"trained_models/DDQN_model/{self.run_time}"
+        # Ensure path exists -> make necesarry folders
+        os.makedirs(path, exist_ok=True)
 
+        # Remove decimals
+        avg_score = int(avg_score)
+        
+        # paths
+        path_main = f"{path}/main_{num_iter}_{avg_score}.pth"
+        path_target = f"{path}/target_{num_iter}_{avg_score}.pth"
+        path_buffer = f"{path}/buffer_{num_iter}_{avg_score}.pkl"
 
+        # remove old files
+        if self.last_path_main and os.path.exists(self.last_path_main):
+            os.remove(self.last_path_main)
 
+        if self.last_path_target and os.path.exists(self.last_path_target):
+            os.remove(self.last_path_target)
+
+        if self.last_path_buffer and os.path.exists(self.last_path_buffer):
+            os.remove(self.last_path_buffer)
+
+        # save main network
+        torch.save(self.model.state_dict(), path_main)
+        # save target network
+        torch.save(self.model_target.state_dict(), path_target)
+        # save memory buffer
+        self.memory.save_buffer(path_buffer)
+
+        # saved paths
+        self.last_path_main = path_main
+        self.last_path_target = path_target
+        self.last_path_buffer = path_buffer

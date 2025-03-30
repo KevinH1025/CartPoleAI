@@ -6,8 +6,8 @@ def train_ddqn(agent, cartpole, render=True):
     if render:
         clock = pygame.time.Clock()
         screen = pygame.display.set_mode((display.WIDTH, display.HEIGHT))
-        iteration = 0
-    
+
+    iteration = 0    
     done = False
     # not done with training
     while not done:
@@ -52,6 +52,10 @@ def train_ddqn(agent, cartpole, render=True):
         # plot graphs after episode ends
         cartpole.plot_score()
         agent.plot_model()
+
+        # save the model if new average is higher
+        if cartpole.old_mean < cartpole.new_mean:
+            agent.save_model(iteration, cartpole.new_mean)
 
     if render:
         pygame.quit()

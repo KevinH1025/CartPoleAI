@@ -4,6 +4,7 @@ import config.display as display
 import config.constants as constants
 import pygame
 from utils.plot import plot_score
+from collections import deque
 
 class CartPole:
     def __init__(self, plot):
@@ -18,13 +19,19 @@ class CartPole:
         self.best_score = 0
         self.num_episodes = 0
 
-        self.reward = 0
-        self.died = False
-
+        # plot?
         self.plot = plot
-        if self.plot: 
+        if plot: 
             self.score = []
             self.mean_score = []
+
+        # track mean of last x episodes -> when to save model
+        self.score_hist = deque(maxlen=100)
+        self.old_mean = 0
+        self.new_mean = 0
+
+        self.reward = 0
+        self.died = False
 
     # one simulation step
     def move(self, action):
@@ -55,8 +62,8 @@ class CartPole:
         # score increases for staying alive
         self.current_score += 1
 
-        # more vertical is the pole more reward
-        self.reward = 1
+        # more vertical is the pole -> more reward
+        self.reward = 1 - abs(self.angle/constants.angle_lim)
 
         # agent did not die
         self.died = False
@@ -80,7 +87,12 @@ class CartPole:
             if self.current_score > self.best_score:
                 self.best_score = self.current_score
 
-            # add plotting values
+            # update score history
+            self.old_mean = self.new_mean
+            self.score_hist.append(self.current_score)
+            self.new_mean = sum(self.score_hist)/len(self.score_hist)
+
+            # add to the plotting data
             if self.plot:
                 self.score.append(self.current_score)
                 self.mean_score.append(sum(self.score)/len(self.score))
@@ -89,7 +101,7 @@ class CartPole:
 
             # reward for exceeding the threshhold
             self.died = True
-            self.reward = -1
+            self.reward = -5
     
     # get the current state
     def get_state(self):
