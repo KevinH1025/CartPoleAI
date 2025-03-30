@@ -1,16 +1,11 @@
-from models.DDQN import DDQN_Agent
-from cartPole import CartPole
-from train import train_ddqn
-from test import test_agent
+from modes.train import train_agent
+from modes.test import test_agent
 
 def main():
-
-    #agent = DDQN_Agent(input=4, plot=True)
-    #cartpole = CartPole(plot = True)
     
-    #train_ddqn(agent, cartpole)
+    train_agent("ddqn")
 
-    test_agent("ddqn")
+    #test_agent("ddqn")
 
 if __name__ == "__main__":
     main()

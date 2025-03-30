@@ -174,16 +174,17 @@ class DDQN_Agent(nn.Module):
                 self.plot_counter = 0
 
     # plot model's values
-    def plot_model(self):
+    def plot_model(self, writer):
         if self.plot and all(len(x)!=0 for x in [self.q_values, self.loss_his, self.loss_mean, self.epsilon]):
                 # plot average Q value for a batch
-                plot_qvalue(self.q_values)
+                writer.add_scalar('Q Values', self.q_values[-1], len(self.q_values))
 
                 # loss and average loss
-                plot_loss(self.loss_his, self.loss_mean)
+                writer.add_scalar('Current Loss', self.loss_his[-1], len(self.loss_his))
+                writer.add_scalar('Average Loss', self.loss_mean[-1], len(self.loss_mean))
 
                 # epsilon
-                plot_epsilon(self.epsilon)
+                writer.add_scalar('Epsilon', self.epsilon[-1], len(self.epsilon))
 
     # save model and memory buffer
     def save_model(self, num_iter, avg_score):

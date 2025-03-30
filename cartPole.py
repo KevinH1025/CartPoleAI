@@ -1,8 +1,8 @@
 import random
 import math
+import pygame
 import config.display as display
 import config.constants as constants
-import pygame
 from utils.plot import plot_score
 from collections import deque
 
@@ -21,7 +21,7 @@ class CartPole:
 
         # plot?
         self.plot = plot
-        if plot: 
+        if self.plot: 
             self.score = []
             self.mean_score = []
 
@@ -34,7 +34,7 @@ class CartPole:
         self.died = False
 
     # one simulation step
-    def move(self, action):
+    def move(self, eplapsed_time, action):
         
         # decoding the action
         if action == 0:
@@ -59,8 +59,8 @@ class CartPole:
         self.pos[0] += self.velocity * constants.dt
         self.angle += self.angular_velocity * constants.dt
 
-        # score increases for staying alive
-        self.current_score += 1
+        # score = time stayed alive
+        self.current_score = eplapsed_time
 
         # more vertical is the pole -> more reward
         self.reward = 1 - abs(self.angle/constants.angle_lim)
@@ -130,6 +130,8 @@ class CartPole:
         pygame.draw.line(screen, display.GREEN, (middle_x, middle_y), (x, y), 3)
 
     # plot the current and mean score
-    def plot_score(self):
+    def plot_score(self, writer):
         if self.plot and len(self.score) >= 1:
-            plot_score(self.score, self.mean_score)
+            writer.add_scalar('Score', self.score[-1], len(self.score))
+            writer.add_scalar('Mean Score', self.mean_score[-1], len(self.mean_score))
+    

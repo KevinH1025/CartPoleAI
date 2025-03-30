@@ -7,8 +7,8 @@ import utils.UI as UI
 def test_agent(algorithm):
     cartpole = CartPole(plot=True)
     # load the corresponding model
+    print("Loading model...")
     if algorithm == "ddqn":
-        print("Loading model...")
         agent = DDQN_Agent(len(cartpole.get_state()), plot=False)
         agent.load_model("trained_models/DDQN_model/20250330_012727_Reward_Shaping")
     else:
@@ -31,7 +31,7 @@ def test_model(cartpole, agent):
         while not end_episode:
             clock.tick(display.FPS)
             current_time = pygame.time.get_ticks()
-            elapsed_time = (current_time - start_time) / 1000 # convert ms into s
+            elapsed_time = int((current_time - start_time) / 1000) # convert ms to s
             for event in pygame.event.get(): # event handling
                 if event.type == pygame.QUIT:
                     done = True
@@ -45,13 +45,13 @@ def test_model(cartpole, agent):
             current_action = agent.get_action(current_state, test=True)
             
             # update cart's movement
-            _, game_over = cartpole.move(action=current_action)
+            _, game_over = cartpole.move(elapsed_time, action=current_action)
 
             # episode ended?
             end_episode = game_over
 
             # render the cartpole
-            UI.render(screen, cartpole, elapsed_time)
+            UI.render(screen, cartpole)
             pygame.display.flip()
 
         # plot score after episode ends

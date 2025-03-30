@@ -1,8 +1,27 @@
 import pygame
 import config.display as display
 import utils.UI as UI
+from models.DDQN import DDQN_Agent
+from cartPole import CartPole
+from torch.utils.tensorboard import SummaryWriter
 
-def train_ddqn(agent, cartpole, render=True):
+def train_agent(algorithm, render=True, plot=True):
+    if plot:
+        writer = SummaryWriter()
+
+    cartpole = CartPole(plot)
+    
+    print("Training model...")
+    if algorithm == "ddqn":
+        agent = DDQN_Agent(len(cartpole.get_state()), plot)
+        train_ddqn(agent, cartpole, writer, render)
+    else:
+        pass
+
+    if writer:
+        writer.close()
+
+def train_ddqn(agent, cartpole, writer, render):
     if render:
         clock = pygame.time.Clock()
         screen = pygame.display.set_mode((display.WIDTH, display.HEIGHT))
@@ -13,13 +32,13 @@ def train_ddqn(agent, cartpole, render=True):
     while not done:
         start_time = pygame.time.get_ticks()
         end_episode = False
-        
+
         # the current episode did not end
         while not end_episode:
             if render:
                 clock.tick(display.FPS)
                 current_time = pygame.time.get_ticks()
-                elapsed_time = (current_time - start_time) / 1000 # convert ms into s
+                elapsed_time = int((current_time - start_time) / 1000) # convert ms to s
                 for event in pygame.event.get(): # event handling
                     if event.type == pygame.QUIT:
                         done = True
@@ -33,7 +52,7 @@ def train_ddqn(agent, cartpole, render=True):
             current_action = agent.get_action(current_state)
             
             # reward from the action
-            reward, game_over = cartpole.move(action=current_action)
+            reward, game_over = cartpole.move(elapsed_time, action=current_action)
 
             # episode ended?
             end_episode = game_over
@@ -50,12 +69,12 @@ def train_ddqn(agent, cartpole, render=True):
 
             # render the cartpole
             if render:
-                UI.render(screen, cartpole, elapsed_time, iteration)
+                UI.render(screen, cartpole, iteration)
                 pygame.display.flip()
 
         # plot graphs after episode ends
-        cartpole.plot_score()
-        agent.plot_model()
+        cartpole.plot_score(writer)
+        agent.plot_model(writer)
 
         # save the model if new average is higher
         if cartpole.old_mean < cartpole.new_mean:
