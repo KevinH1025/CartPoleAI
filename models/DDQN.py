@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch.optim as optim
 from config.hyperpara import DDQN_param
 from utils.memory import DDQN_MemoryBuffer
-from utils.plot import plot_loss, plot_qvalue, plot_epsilon
 
 class DDQN_Agent(nn.Module):
     def __init__(self, input:int, plot:bool, output=2):

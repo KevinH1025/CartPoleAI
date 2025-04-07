@@ -1,5 +1,4 @@
 import random
-import os
 import pickle
 from collections import deque
 

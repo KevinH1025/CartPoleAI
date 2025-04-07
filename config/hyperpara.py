@@ -1,5 +1,3 @@
-import datetime
-
 class DDQN_param:
     def __init__(self):
         # model's para
