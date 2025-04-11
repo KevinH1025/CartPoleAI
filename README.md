@@ -56,9 +56,9 @@ CartPoleAI/
 pip install -r requirements.txt
 ```
 
-This project uses command-line arguments to control training and testing.
-
 ### Arguments:
+
+This project uses command-line arguments to control training and testing.
 
 - `--mode`: `train` to train an agent, or `test` to test a trained model
 - `--algo`: `ddqn` or `ppo` (currently only `ddqn` is implemented)
