@@ -1,2 +1,8 @@
 __pycache__/
 *.pyc
+
+# logging files
+runs
+
+# trained models
+trained_models/DDQN_model

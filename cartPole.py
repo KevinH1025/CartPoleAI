@@ -3,7 +3,6 @@ import math
 import pygame
 import config.display as display
 import config.constants as constants
-from utils.plot import plot_score
 from collections import deque
 
 class CartPole:

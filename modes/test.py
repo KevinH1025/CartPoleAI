@@ -4,15 +4,18 @@ import pygame
 import config.display as display
 import utils.UI as UI
 
-def test_agent(algorithm):
+def test_agent(algorithm, path):
     cartpole = CartPole(plot=True)
     # load the corresponding model
     print("Loading model...")
     if algorithm == "ddqn":
         agent = DDQN_Agent(len(cartpole.get_state()), plot=False)
-        agent.load_model("trained_models/DDQN_model/20250330_012727_Reward_Shaping")
+        agent.load_model(path)
+    elif algorithm == "ppo":
+        print("PPO training is not implemented yet")
+        return
     else:
-        pass
+        raise ValueError(f"Unsupported algorithm: {algorithm}")
 
     test_model(cartpole, agent)
 

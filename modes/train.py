@@ -15,11 +15,16 @@ def train_agent(algorithm, render=True, plot=True):
     if algorithm == "ddqn":
         agent = DDQN_Agent(len(cartpole.get_state()), plot)
         train_ddqn(agent, cartpole, writer, render)
+    elif algorithm == "ppo":
+        print("PPO training is not implemented yet")
+        return
     else:
-        pass
-
+        raise ValueError(f"Unsupported algorithm: {algorithm}")
+    
     if writer:
         writer.close()
+    
+    print("Training stopped.")
 
 def train_ddqn(agent, cartpole, writer, render):
     if render:
