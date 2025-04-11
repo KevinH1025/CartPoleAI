@@ -41,36 +41,84 @@ CartPoleAI/
 - Custom CartPole environment using Pygame (not OpenAI Gym)
 - Reward shaping for more stable learning
 - Deep Double Q-Networks (DDQN)
-- Experience replay buffer
-- Mitigation of catastrophic forgetting
+- Experience replay buffer -> Mitigation of catastrophic forgetting
+- Save/load model checkpoints
 
-----
+---
 
 ## Set Up
 
 ### Requirements
 - Python 3.8+
 - Install dependencies:
-```
+
+```bash
 pip install -r requirements.txt
 ```
 
-### Run Training
-```
-python main.py
+This project uses command-line arguments to control training and testing.
+
+### Arguments:
+
+- `--mode`: `train` to train an agent, or `test` to test a trained model
+- `--algo`: `ddqn` or `ppo` (currently only `ddqn` is implemented)
+- `--render`: (optional) Enables Pygame rendering during training. Automatically enabled during testing
+- `--model_path`: Path to the trained model folder (required for test mode)
+
+### Examples
+
+**Train a DDQN agent (with rendering):**
+
+```bash
+python3 main.py --mode train --algo ddqn --render
 ```
 
-### Run Evaluation
+**Train a DDQN agent (no rendering):**
+
+```bash
+python3 main.py --mode train --algo ddqn
 ```
-python main.py
+
+**Test a trained DDQN agent (always renders):**
+
+```bash
+python3 main.py --mode test --algo ddqn --model_path trained_models/DDQN_model/choose_model
+```
+
+---
+
+### TensorBoard Visualization
+
+This project logs real-time training metrics for visualization and performance monitoring.
+
+#### View in VSCode
+
+1. Install the **TensorBoard** extension
+2. Start training, logs will be saved in `runs/`
+3. Open Command Palette (`Cmd+Shift+P` on Mac or `Ctrl+Shift+P` on Windows)
+4. Select `Python: Launch TensorBoard`, then choose `Use Current Working Directory`
+
+TensorBoard will open inside VSCode in a new tab.
+
+#### View in browser
+
+While training is running, open new terminal and run:
+
+```bash
+python3 -m tensorboard.main --logdir runs
+```
+
+Then visit:
+
+```
+http://localhost:6006
 ```
 
 ---
 
 ## TODO
 - Add PPO and Dueling DDQN
-- Spawn CartPole randomly, which will yield better result during evaluation
+- Spawn CartPole at random position during training, which will yield better result during evaluation
 - More advanced reward shaping strategies 
-- Save/load model checkpoints
 
 
