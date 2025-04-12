@@ -81,7 +81,7 @@ python3 main.py --mode train --algo ddqn
 
 **Test a trained DDQN agent (always renders):**
 
-```bash
+```
 python3 main.py --mode test --algo ddqn --model_path trained_models/DDQN_model/choose_model
 ```
 
