@@ -6,14 +6,11 @@ import config.constants as constants
 from collections import deque
 
 class CartPole:
-    def __init__(self, plot:bool):
-        self.pos = [display.WIDTH/(2 * display.scaling), 2/3 * display.HEIGHT] # cart's initial postion, in the middle of line (x-axis scaled into meters)
-        self.velocity = 0 # cart's initial velocity
-        self.angle = random.uniform(-constants.init_angle, constants.init_angle) # pole's initial angle
+    def __init__(self, plot:bool, mode):
+        self.mode = mode # train/test mode
+        self.pos, self.angle, self.velocity, self.angular_velocity, self.force = self.init() # init values
 
-        self.angular_velocity = 0 # pole's initial angular velocity
-        self.force = 0 # initial force applied to the cart
-
+        # tracking score and num of episodes
         self.current_score = 0 
         self.best_score = 0
         self.num_episodes = 0
@@ -31,6 +28,23 @@ class CartPole:
 
         self.reward = 0
         self.died = False
+
+    # initialize default values
+    def init(self):
+        if self.mode == 'train':
+            margin = 1 * display.scaling
+            x_pos = random.uniform(margin, display.WIDTH - margin) / display.scaling   # cart's initial postion, random on the line (x-axis scaled into meters), 1 m from both edges
+        elif self.mode == 'test':
+            x_pos = display.WIDTH/(2 * display.scaling)        # spawn in the middle
+        y_pos = 2/3 * display.HEIGHT
+
+        pos = [x_pos, y_pos]
+        angle = random.uniform(-constants.init_angle, constants.init_angle)   # pole's initial angle
+        vel = 0         # cart's initial velocity
+        ang_vel = 0     # pole's initial angular velocity
+        force = 0       # initial force applied to the cart
+
+        return pos, angle, vel, ang_vel, force
 
     # one simulation step
     def move(self, eplapsed_time, action):
@@ -61,8 +75,10 @@ class CartPole:
         # score = time stayed alive
         self.current_score = eplapsed_time
 
-        # more vertical is the pole -> more reward
-        self.reward = 1 - abs(self.angle/constants.angle_lim)
+        # more vertical is the pole and the cart more in the middle -> more reward
+        position_penalty = abs(self.pos[0] - constants.pos_lim/2) / (constants.pos_lim/2) # pos penalty
+        pole_penalty = 1 - abs(self.angle/constants.angle_lim)                            # pole penalty
+        self.reward = pole_penalty - 0.1 * position_penalty
 
         # agent did not die
         self.died = False
@@ -72,14 +88,23 @@ class CartPole:
 
         return self.reward, self.died
 
-    # end the episode if exceed the limit
+    # end the episode if exceed the limit or agent learned to balance the pole
     def reset(self):
-        if self.pos[0] < 0 or self.pos[0] > constants.pos_lim or abs(self.angle) > constants.angle_lim:
-            self.pos[0] = display.WIDTH/(2 * display.scaling)
-            self.velocity = 0 
-            self.angle = random.uniform(-constants.init_angle, constants.init_angle) 
-            self.angular_velocity = 0 
+        done = False
+        reason = None
 
+        if self.pos[0] < 0 or self.pos[0] > constants.pos_lim:
+            reason = "out_of_bounds"
+            done = True
+        elif abs(self.angle) > constants.angle_lim:
+            reason = "angle_limit"
+            done = True
+        elif self.current_score > constants.max_score:
+            reason = "success"
+            done = True
+
+        if done:
+            self.pos, self.angle, self.velocity, self.angular_velocity, self.force = self.init()
             self.num_episodes += 1
 
             # best score
@@ -97,10 +122,15 @@ class CartPole:
                 self.mean_score.append(sum(self.score)/len(self.score))
 
             self.current_score = 0
-
-            # reward for exceeding the threshhold
             self.died = True
-            self.reward = -5
+
+            # reward for different termination reasons
+            if reason == "out_of_bounds":
+                self.reward = -5
+            elif reason == "angle_limit":
+                self.reward = -5
+            elif reason == "success":
+                self.reward = 10
     
     # get the current state
     def get_state(self):

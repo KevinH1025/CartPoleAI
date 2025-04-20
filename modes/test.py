@@ -5,7 +5,9 @@ import config.display as display
 import utils.UI as UI
 
 def test_agent(algorithm, path):
-    cartpole = CartPole(plot=True)
+    plot = True
+    cartpole = CartPole(plot, 'test')
+
     # load the corresponding model
     print("Loading model...")
     if algorithm == "ddqn":
@@ -20,7 +22,7 @@ def test_agent(algorithm, path):
     test_model(cartpole, agent)
 
 # test the model 
-def test_model(cartpole, agent):
+def test_model(cartpole:CartPole, agent:DDQN_Agent):
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((display.WIDTH, display.HEIGHT))
     done = False

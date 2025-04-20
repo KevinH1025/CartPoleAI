@@ -9,7 +9,7 @@ def train_agent(algorithm, render=True, plot=True):
     if plot:
         writer = SummaryWriter()
 
-    cartpole = CartPole(plot)
+    cartpole = CartPole(plot, 'train')
     
     print("Training model...")
     if algorithm == "ddqn":
@@ -26,7 +26,7 @@ def train_agent(algorithm, render=True, plot=True):
     
     print("Training stopped.")
 
-def train_ddqn(agent, cartpole, writer, render):
+def train_ddqn(agent:DDQN_Agent, cartpole:CartPole, writer, render):
     if render:
         clock = pygame.time.Clock()
         screen = pygame.display.set_mode((display.WIDTH, display.HEIGHT))
