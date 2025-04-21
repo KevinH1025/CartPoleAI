@@ -96,9 +96,12 @@ This project logs real-time training metrics for visualization and performance m
 1. Install the **TensorBoard** extension
 2. Start training, logs will be saved in `runs/`
 3. Open Command Palette (`Cmd+Shift+P` on Mac or `Ctrl+Shift+P` on Windows)
-4. Select `Python: Launch TensorBoard`, then choose `Use Current Working Directory`
-
-TensorBoard will open inside VSCode in a new tab.
+4. Select `Python: Launch TensorBoard`,
+5. Choose `Select another folder`, then navigate to a specific run inside:
+   ```
+   CartPoleAI/runs/<current_run>/
+   ```
+7. TensorBoard will open in a new VSCode tab and visualize metrics for the currrent run
 
 #### View in browser
 
