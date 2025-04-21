@@ -22,7 +22,7 @@ class CartPole:
             self.mean_score = []
 
         # track mean of last x episodes -> when to save model
-        self.score_hist = deque(maxlen=100)
+        self.score_hist = deque(maxlen=50)
         self.old_mean = 0
         self.new_mean = 0
 
@@ -74,11 +74,12 @@ class CartPole:
 
         # score = time stayed alive
         self.current_score = eplapsed_time
-
-        # more vertical is the pole and the cart more in the middle -> more reward
-        position_penalty = abs(self.pos[0] - constants.pos_lim/2) / (constants.pos_lim/2) # pos penalty
-        pole_penalty = 1 - abs(self.angle/constants.angle_lim)                            # pole penalty
-        self.reward = pole_penalty - 0.1 * position_penalty
+        
+        base_reward = 1.0
+        # more vertical is the pole and the cart in the middle -> more reward
+        position_penalty = 1 - abs(self.pos[0] - constants.pos_lim/2)    # pos penalty
+        pole_penalty = 1 - abs(self.angle/constants.angle_lim)           # pole penalty
+        self.reward = base_reward + 0.1 * (pole_penalty + position_penalty)
 
         # agent did not die
         self.died = False
@@ -130,7 +131,7 @@ class CartPole:
             elif reason == "angle_limit":
                 self.reward = -5
             elif reason == "success":
-                self.reward = 10
+                self.reward = 15
     
     # get the current state
     def get_state(self):

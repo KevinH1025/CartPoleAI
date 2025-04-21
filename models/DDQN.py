@@ -43,6 +43,11 @@ class DDQN_Agent(nn.Module):
         self.loss = nn.MSELoss()
         self.memory = DDQN_MemoryBuffer(self.param.buffer_size, self.param.batch_size)
 
+        # scheduler
+        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optim,
+                                            step_size=20000,
+                                            gamma=0.8)
+
         # counters
         self.epsilon_counter = 0 # used for updating epsilon 
         self.target_counter = 0 # used for updating target network
@@ -146,8 +151,9 @@ class DDQN_Agent(nn.Module):
         # clipping the gradient
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
 
-        # perform a gradient step
+        # perform a gradient and scheduler step
         self.optim.step()
+        self.scheduler.step()
 
         # update the target 
         self.target_counter += 1
