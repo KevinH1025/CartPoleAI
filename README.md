@@ -20,9 +20,11 @@ CartPoleAI/
 │
 ├── trained_models/          # Saved models and buffers
 │   ├── DDQN_model/          
-│   │   ├── model.pth          # Trained DDQN model
-│   │   └── replay_buffer.pkl  # Replay buffer
-│   └── PPO_model/             # PPO model storage (Planned) 
+│   │   └── Perfect_model/     # Can balance > 4 min
+│   │       ├── buffer.pkl     # Replay buffer
+│   │       ├── main.pth       # Main network 
+│   │       └── target.pth     # Target network
+│   └── PPO_model/           # PPO model storage (Planned) 
 │
 ├── utils/                   
 │   ├── memory.py            # Replay memory buffer
@@ -82,8 +84,18 @@ python3 main.py --mode train --algo ddqn
 **Test a trained DDQN agent (always renders):**
 
 ```
-python3 main.py --mode test --algo ddqn --model_path trained_models/DDQN_model/choose_model
+python3 main.py --mode test --algo ddqn --model_path trained_models/DDQN_model/choose_your_model
 ```
+
+### Pretraied Model
+
+Under `trained_models/DDQN_model/Perfect_model/` you’ll find a pretrained network that can balance the pole for over 4 minutes. To test it, run:
+
+```bash
+python3 main.py --mode test --algo ddqn --model_path trained_models/DDQN_model/Perfect_model
+```
+
+A Pygame window will pop up with the CartPole spawning in the center of the screen.
 
 ---
 
@@ -120,8 +132,6 @@ http://localhost:6006
 ---
 
 ## TODO
-- Add PPO and Dueling DDQN
-- Spawn CartPole at random position during training, which will yield better result during evaluation
-- More advanced reward shaping strategies 
-
-
+- Implement Proximal Policy Optimization (PPO) and Dueling DDQN  
+- Add an option to resume training from saved checkpoints
+- Include a small animated GIF under **Pretrained Model** showcasing the CartPole balancing process
